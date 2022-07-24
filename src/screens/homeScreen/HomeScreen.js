@@ -9,9 +9,11 @@ import {
   TouchableOpacity,
   View,
   Linking,
+  StatusBar,
 } from "react-native";
 import IceCreamCard from "../../components/home/IceCreamCard";
 import TopBar from "../../components/home/TopBar";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const HomeScreen = () => {
   const [iceCreams, setIceCreams] = useState([
@@ -93,10 +95,34 @@ const HomeScreen = () => {
       img: "data:image/jpeg;base64,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",
     },
   ]);
-  const [dolarPrice, setDolarPrice] = useState(5700);
+  const [dolarPrice, setDolarPrice] = useState(0);
   const [dolarAmount, setDolarAmount] = useState(0);
   const [bsAmount, setBsAmount] = useState(0);
   const [isModal, setIsModal] = useState(false);
+  const [inputValue, setInputValue] = useState("");
+
+  const storeData = async () => {
+    try {
+      await AsyncStorage.setItem("@dolarPrice", inputValue.toString());
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  const getData = async () => {
+    try {
+      const value = await AsyncStorage.getItem("@dolarPrice");
+      if (value !== null) {
+        setDolarPrice(value);
+      }
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  useEffect(() => {
+    getData();
+  }, []);
 
   const handleAdd = (name) => {
     setIceCreams(
@@ -132,7 +158,8 @@ const HomeScreen = () => {
     const total = iceCreams.reduce((acc, item) => {
       return acc + item.sellAmount * item.sellPrice;
     }, 0);
-    setBsAmount(Math.floor(total * dolarPrice));
+    const bsToDolar = total * dolarPrice;
+    setBsAmount(Math.round(bsToDolar * 100) / 100);
     setDolarAmount(Math.round(total * 10) / 10);
   }, [iceCreams]);
 
@@ -142,6 +169,7 @@ const HomeScreen = () => {
 
   return (
     <>
+      <StatusBar backgroundColor="white" barStyle="dark-content" />
       <Modal visible={isModal} animationType="slide">
         <View style={styles.modalView}>
           <Text>Valor actual del Bolivar: {dolarPrice} Bsf</Text>
@@ -155,10 +183,18 @@ const HomeScreen = () => {
           <Text>Nuevo valor:</Text>
           <TextInput
             style={styles.input}
-            onChangeText={(value) => setDolarPrice(value)}
+            onChangeText={(value) => setInputValue(value)}
+            keyboardType={"numeric"}
           />
-          <TouchableOpacity style={styles.buttons} onPress={handleModal}>
-            <Text>Close Modal</Text>
+          <TouchableOpacity
+            style={styles.buttons}
+            onPress={() => {
+              handleModal();
+              storeData();
+              getData();
+            }}
+          >
+            <Text>Volver atras</Text>
           </TouchableOpacity>
         </View>
       </Modal>
@@ -189,7 +225,6 @@ const HomeScreen = () => {
 };
 
 const styles = StyleSheet.create({
-  container: {},
   modalView: {
     display: "flex",
     flexDirection: "column",

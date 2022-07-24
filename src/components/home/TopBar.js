@@ -28,7 +28,7 @@ const TopBar = ({
         <Text style={styles.amountTexts}>{bsAmount} Bsf.</Text>
         <Text style={styles.amountTexts}>{dolarAmount} $.</Text>
         <TouchableOpacity style={styles.buttons} onPress={handleClear}>
-          <Text>Clear</Text>
+          <Text>Borrar todo</Text>
         </TouchableOpacity>
       </View>
     </View>
